@@ -15,6 +15,10 @@ import {
   Flag,
   RefreshCw,
 } from "lucide-react";
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
+import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -101,6 +105,17 @@ const rankConfig = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Home() {
+
+  const {user, loading: authLoading} = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, user, router]);
+
+
   const [refreshing, setRefreshing] = useState(false);
   const [userStats, setUserStats] = useState({ reports: 15, cleanups: 8, points: 340 });
 
@@ -138,6 +153,9 @@ export default function Home() {
     y: (1 - (lat - mapBounds.minLat) / (mapBounds.maxLat - mapBounds.minLat)) * 100,
   });
 
+  if (authLoading) return <p className="p-6">Loading...</p>;
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background transition-colors duration-300">
       <div className="max-w-2xl mx-auto pb-10">
@@ -147,10 +165,10 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <p className="text-sm text-gray-500 dark:text-muted-foreground font-medium">
-                Hello Volunteer,
+                Hello {user.displayName || "User"},
               </p>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground mt-0.5">
-                KAMESH S
+                {user.displayName || "Eco Enthusiast"}
               </h1>
               <div className="flex items-center gap-2 mt-2">
                 <span className="bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -163,6 +181,17 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  await signOut(auth)
+                  router.push("/auth/login")
+                }}
+              >
+                Logout
+              </Button>
+
               {/* Dark / Light toggle */}
               <ThemeToggle />
 

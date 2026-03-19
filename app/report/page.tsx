@@ -17,6 +17,8 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,6 +46,16 @@ const wasteTypes = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Report() {
+
+  const {user, loading: authLoading} = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, user, router]);
+
   const [cameraMode, setCameraMode]   = useState<CameraMode>("idle");
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [stream, setStream]           = useState<MediaStream | null>(null);

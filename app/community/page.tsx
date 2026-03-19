@@ -14,6 +14,8 @@ import {
   CalendarDays,
   ChevronRight,
 } from "lucide-react";
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -42,6 +44,15 @@ const contributors = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Community() {
+
+  const {user, loading: authLoading} = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, user, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background transition-colors duration-300">

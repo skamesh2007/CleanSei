@@ -14,6 +14,8 @@ import {
   LogOut,
   ImageIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +41,15 @@ const activityStats = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Profile() {
+
+  const {user, loading: authLoading} = useAuth();
+    const router = useRouter();
+  
+    useEffect(() => {
+      if (!authLoading && !user) {
+        router.push("/auth/login");
+      }
+    }, [authLoading, user, router]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-background transition-colors duration-300">

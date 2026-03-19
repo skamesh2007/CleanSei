@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Wifi } from "lucide-react";
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,6 +31,17 @@ const products: Product[] = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Store() {
+  const {user, loading: authLoading} = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [authLoading, user, router]);
+
+
+
   const [cart, setCart] = useState<number[]>([]);
 
   const addToCart = (id: number) =>

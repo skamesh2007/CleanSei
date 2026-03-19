@@ -1,5 +1,10 @@
 export type Severity = "high" | "medium" | "low";
-export type ReportStatus = "resolved" | "in_progress" | "pending" | string;
+
+export type ReportStatus =
+  | "resolved"
+  | "in_progress"
+  | "pending"
+  | "unknown";
 
 export type Hotspot = {
   id: number;
@@ -8,6 +13,8 @@ export type Hotspot = {
   title: string;
   severity: Severity;
   type: string;
+  distance?: string;
+  time?: string;
 };
 
 export type LiveReport = {
@@ -17,6 +24,7 @@ export type LiveReport = {
   status: ReportStatus;
   time: string;
   location: string;
+  type?: string; // ✅ merged properly
 };
 
 export type Contributor = {

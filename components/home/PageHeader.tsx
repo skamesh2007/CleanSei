@@ -1,83 +1,138 @@
+"use client";
+
 import { RefreshCw, Leaf } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { UserStats } from "../../lib/home/type";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Props = {
   displayName: string | null;
+  photoURL?: string | null;
   stats: UserStats;
   refreshing: boolean;
   onRefresh: () => void;
 };
 
-export function PageHeader({ displayName, stats, refreshing, onRefresh }: Props) {
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function PageHeader({
+  displayName,
+  photoURL,
+  stats,
+  refreshing,
+  onRefresh,
+}: Props) {
   const firstName = displayName?.split(" ")[0] ?? "Welcome";
+  const initials  = displayName
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() ?? "U";
+
+  const today = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
-    <header className="px-5 pt-10 pb-6">
-      <div className="flex items-start justify-between">
-        {/* ── Greeting ── */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <Leaf size={14} className="text-emerald-400" />
-            <span className="text-xs font-semibold tracking-widest uppercase text-emerald-400">
-              CleanSei
-            </span>
+    <TooltipProvider delayDuration={300}>
+      <header className="px-5 pt-10 pb-6">
+        <div className="flex items-start justify-between">
+
+          {/* ── Left: brand + greeting + badges ── */}
+          <div className="flex-1 min-w-0">
+
+            {/* Brand */}
+            <div className="flex items-center gap-2 mb-1">
+              <Leaf size={14} className="text-emerald-400" />
+              <span className="text-xs font-semibold tracking-widest uppercase text-emerald-400">
+                CleanSei
+              </span>
+            </div>
+
+            {/* Name */}
+            <h1 className="text-3xl font-bold text-white leading-tight tracking-tight">
+              {firstName}
+            </h1>
+
+            {/* Date */}
+            <p className="text-zinc-400 text-sm mt-0.5">{today}</p>
+
+            {/* Badges */}
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge className="gap-1.5 text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/15 text-amber-300 border border-amber-500/20 rounded-full px-3 py-1 cursor-default">
+                    🏆 Eco Warrior
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Your current volunteer level
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge className="gap-1.5 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 rounded-full px-3 py-1 cursor-default">
+                    ⭐ {stats.points} pts
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-xs">
+                  Your SwachhScore — keep reporting!
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-white leading-tight tracking-tight">
-            {firstName}
-          </h1>
-          <p className="text-zinc-400 text-sm mt-0.5">
-            {new Date().toLocaleDateString("en-IN", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-            })}
-          </p>
+          {/* ── Right: avatar ── */}
+          <div className="flex items-center gap-3 ml-4 flex-shrink-0">
 
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-amber-500/10 ring-1 ring-amber-500/25 text-amber-300 text-xs font-semibold px-3 py-1 rounded-full">
-              🏆 Eco Warrior
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 ring-1 ring-emerald-500/25 text-emerald-300 text-xs font-semibold px-3 py-1 rounded-full">
-              ⭐ {stats.points} pts
-            </span>
+
+            <div className="relative">
+              <Avatar className="w-14 h-14 rounded-2xl ring-2 ring-emerald-500/30">
+                <AvatarImage
+                  src={photoURL ?? "/images/profile-placeholder.png"}
+                  alt={displayName ?? "Profile"}
+                  className="object-cover"
+                />
+                <AvatarFallback className="rounded-2xl bg-emerald-600 text-white text-sm font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+
+              {/* Points bubble */}
+              <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30 border-2 border-[#0a0a0f]">
+                {stats.points > 999 ? "1k+" : stats.points}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* ── Controls + Avatar ── */}
-        <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-          <div className="relative">
-            <img
-              src="/images/profile-placeholder.png"
-              alt="Profile"
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-emerald-500/30"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  displayName ?? "U"
-                )}&background=10b981&color=fff&size=56`;
-              }}
-            />
-            <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-              {stats.points > 999 ? "1k+" : stats.points}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Refresh ── */}
-      <button
-        onClick={onRefresh}
-        disabled={refreshing}
-        className="mt-4 flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50 group"
-      >
-        <RefreshCw
-          size={11}
-          className={`transition-transform group-hover:rotate-180 duration-500 ${
-            refreshing ? "animate-spin" : ""
-          }`}
-        />
-        {refreshing ? "Refreshing…" : "Refresh data"}
-      </button>
-    </header>
+        {/* ── Refresh ── */}
+        <button
+          onClick={onRefresh}
+          disabled={refreshing}
+          className="mt-4 flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50 group"
+        >
+          <RefreshCw
+            size={11}
+            className={`transition-transform group-hover:rotate-180 duration-500 ${
+              refreshing ? "animate-spin" : ""
+            }`}
+          />
+          {refreshing ? "Refreshing…" : "Refresh data"}
+        </button>
+      </header>
+    </TooltipProvider>
   );
 }

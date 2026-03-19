@@ -14,7 +14,6 @@ import { SwachhScore }    from "../../components/profile/SwachhScore";
 import { Achievements }   from "../../components/profile/Achievements";
 import { ActivityStats }  from "../../components/profile/ActivityStats";
 import { NftBadges }      from "../../components/profile/NftBadges";
-import { ProfileActions } from "../../components/profile/ProfileActions";
 
 import { BADGES, ACTIVITY_STATS } from "../../data/profile/mock";
 
@@ -68,7 +67,6 @@ export default function Profile() {
 
           <NftBadges />
 
-          <ProfileActions onLogout={handleLogout} />
         </div>
 
       </div>

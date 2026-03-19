@@ -1,15 +1,5 @@
 # dependencies
 /node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
 
 # next.js
 /.next/
@@ -20,6 +10,7 @@
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
 
 # debug
@@ -28,11 +19,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# env files
+# env
 .env*.local
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
+# editor
+.vscode/
+.idea/
+
+# misc files
 repomix-output.xml

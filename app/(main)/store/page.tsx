@@ -21,10 +21,10 @@ type Product = {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const products: Product[] = [
-  { id: 1, name: "Protective Gloves",     price: 120,  points: 50,  img: "/images/protective-gloves.png" },
-  { id: 2, name: "Reflective Jacket",     price: 300,  points: 110, img: "/images/reflective-jacket.png" },
-  { id: 3, name: "Waste Collection Bag",  price: 80,   points: 30,  img: "/images/waste-bag.png"         },
-  { id: 4, name: "IoT Fill-Level Sensor", price: 2500, points: 950, img: "/images/sensor.png"            },
+  { id: 1, name: "Protective Gloves",     price: 120,  points: 50,  img: "/demo/protective-gloves.png" },
+  { id: 2, name: "Reflective Jacket",     price: 300,  points: 110, img: "/demo/reflective-jacket.png" },
+  { id: 3, name: "Waste Collection Bag",  price: 80,   points: 30,  img: "/demo/waste-bag.png" },
+  { id: 4, name: "IoT Fill-Level Sensor", price: 2500, points: 950, img: "/demo/sensor.png" },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────

@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const fontMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "SwachhApp",
+  title: "CleanSei",
   description: "Community waste reporting platform",
 };
 
@@ -22,6 +22,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("antialiased", fontMono.variable, inter.variable, "font-sans")}
     >
+      <head>
+        <link rel="icon" type="image/x-icon" href="/assets/images/favicon.png" />   
+      </head>
       <body className="bg-gray-50 dark:bg-background">
         <ThemeProvider>
           {/* Main content — padded at bottom so content isn't hidden behind nav */}

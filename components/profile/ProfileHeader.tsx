@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Settings } from "lucide-react";
-import { SettingsSheet } from "../../components/profile/Settingssheet";
+import { SettingsSheet } from "@/components/profile/SettingsSheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

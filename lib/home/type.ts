@@ -15,6 +15,7 @@ export type Hotspot = {
   type: string;
   distance?: string;
   time?: string;
+  image?: string;
 };
 
 export type LiveReport = {

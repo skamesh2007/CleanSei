@@ -36,6 +36,7 @@ export const ACTIVITY_STATS: ActivityStat[] = [
     value: 10,
     max: 30,
     delta: "+2 this week",
+    tooltip: "Total reports you have submitted",
     icon: <FileText size={16} className="text-green-600" />,
     theme: {
       iconBg: "bg-green-50",
@@ -49,6 +50,7 @@ export const ACTIVITY_STATS: ActivityStat[] = [
     value: 12,
     max: 20,
     delta: "Active",
+    tooltip: "Number of cleanups you participated in",
     icon: <Users size={16} className="text-emerald-600" />,
     theme: {
       iconBg: "bg-emerald-50",
@@ -62,6 +64,7 @@ export const ACTIVITY_STATS: ActivityStat[] = [
     value: 240,
     max: 500,
     delta: "Warrior",
+    tooltip: "Points earned from activities and reports",
     icon: <Star size={16} className="text-amber-500" />,
     theme: {
       iconBg: "bg-amber-50",

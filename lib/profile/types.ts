@@ -15,9 +15,9 @@ export type ActivityStat = {
   label: string;
   value: number;
 
-  max?: number;
-  delta?: string;
-  tooltip?: string;
+  max: number;
+  delta: string;
+  tooltip: string;
 
   icon?: React.ReactNode;
 

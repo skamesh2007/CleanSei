@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
+import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -190,6 +192,11 @@ export default function Profile() {
             <Button
               variant="ghost"
               className="w-full flex items-center justify-center gap-2 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/60 text-red-500 dark:text-red-400 rounded-full py-3 text-base font-semibold transition-colors border border-red-100 dark:border-red-900/50"
+
+              onClick={async () => {
+                  await signOut(auth)
+                  router.push("/auth/login")
+                }}
             >
               <LogOut size={20} />
               Logout

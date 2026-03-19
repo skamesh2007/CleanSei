@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
-import { signOut } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -181,16 +180,6 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={async () => {
-                  await signOut(auth)
-                  router.push("/auth/login")
-                }}
-              >
-                Logout
-              </Button>
 
               {/* Dark / Light toggle */}
               <ThemeToggle />

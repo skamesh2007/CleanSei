@@ -22,16 +22,9 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("antialiased", fontMono.variable, inter.variable, "font-sans")}
     >
-      <head>
-        <link rel="icon" type="image/x-icon" href="/assets/images/favicon.png" />   
-      </head>
-      <body className="bg-gray-50 dark:bg-background">
+      <body>
         <ThemeProvider>
-          {/* Main content — padded at bottom so content isn't hidden behind nav */}
-          <main className="pb-[76px]">{children}</main>
-
-          {/* Bottom navigation bar — mirrors Expo Router <Tabs> */}
-          <BottomNav />
+          {children}
         </ThemeProvider>
       </body>
     </html>

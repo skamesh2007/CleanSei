@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { Leaf } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter()
@@ -67,59 +68,89 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-svh items-center justify-center p-6">
       <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your credentials</CardDescription>
-          </CardHeader>
+        <Card className="shadow-lg border border-gray-100 dark:border-border rounded-2xl">
+  
+            <CardHeader className="space-y-4 text-center pb-2">
 
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <FieldGroup>
-                <Field>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </Field>
+              {/* Brand */}
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center ring-1 ring-emerald-500/20">
+                  <Leaf size={16} className="text-emerald-500" />
+                </div>
+                <span className="text-sm font-semibold tracking-wide text-emerald-500">
+                  CleanSei
+                </span>
+              </div>
 
-                <Field>
-                  <FieldLabel>Password</FieldLabel>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </Field>
+              {/* Title */}
+              <CardTitle className="text-2xl font-bold">
+                Welcome back
+              </CardTitle>
 
-                {error && (
-                  <p className="text-sm text-red-500">{error}</p>
-                )}
+              {/* Subtitle */}
+              <CardDescription className="text-sm text-muted-foreground">
+                Sign in to continue to your dashboard
+              </CardDescription>
 
-                <Field>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loading}
-                  >
-                    {loading ? "Logging in..." : "Login"}
-                  </Button>
+            </CardHeader>
 
-                  <FieldDescription className="text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/auth/register" className="underline">
-                      Sign up
-                    </Link>
-                  </FieldDescription>
-                </Field>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
+            <CardContent className="pt-4">
+              <form onSubmit={handleSubmit}>
+                <FieldGroup className="space-y-4">
+
+                  <Field>
+                    <FieldLabel>Email</FieldLabel>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Password</FieldLabel>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                  </Field>
+
+                  {error && (
+                    <p className="text-sm text-red-500 text-center">{error}</p>
+                  )}
+
+                  <Field className="space-y-3">
+
+                    <Button
+                      type="submit"
+                      className="w-full h-10 font-semibold"
+                      disabled={loading}
+                    >
+                      {loading ? "Logging in..." : "Login"}
+                    </Button>
+
+                    <FieldDescription className="text-center text-sm text-muted-foreground">
+                      Don&apos;t have an account?{" "}
+                      <Link
+                        href="/auth/register"
+                        className="font-medium text-emerald-500 hover:underline"
+                      >
+                        Sign up
+                      </Link>
+                    </FieldDescription>
+
+                  </Field>
+
+                </FieldGroup>
+              </form>
+            </CardContent>
+
+          </Card>
       </div>
     </div>
   )

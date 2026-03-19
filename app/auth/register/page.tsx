@@ -97,97 +97,123 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader>
-            <CardTitle>Create an account</CardTitle>
-            <CardDescription>
-              Enter your details to get started
-            </CardDescription>
-          </CardHeader>
+        <Card className="shadow-lg border border-gray-100 dark:border-border rounded-2xl">
 
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <FieldGroup>
+            <CardHeader className="space-y-4 text-center pb-2">
 
-                <Field>
-                  <FieldLabel>Full Name</FieldLabel>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </Field>
+              {/* Brand */}
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center ring-1 ring-emerald-500/20">
+                  <span className="text-emerald-500 text-lg font-bold">♻️</span>
+                </div>
+                <span className="text-sm font-semibold tracking-wide text-emerald-500">
+                  CleanSei
+                </span>
+              </div>
 
-                <Field>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  <FieldDescription>
-                    We won’t share your email.
-                  </FieldDescription>
-                </Field>
+              {/* Title */}
+              <CardTitle className="text-2xl font-bold">
+                Create your account
+              </CardTitle>
 
-                <Field>
-                  <FieldLabel>Password</FieldLabel>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </Field>
+              {/* Subtitle */}
+              <CardDescription className="text-sm text-muted-foreground">
+                Start reporting and making an impact
+              </CardDescription>
 
-                <Field>
-                  <FieldLabel>Confirm Password</FieldLabel>
-                  <Input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) =>
-                      setConfirmPassword(e.target.value)
-                    }
-                    required
-                  />
-                </Field>
+            </CardHeader>
 
-                {error && (
-                  <p className="text-sm text-red-500">{error}</p>
-                )}
+            <CardContent className="pt-4">
+              <form onSubmit={handleSubmit}>
+                <FieldGroup className="space-y-4">
 
-                <Field>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={loading}
-                  >
-                    {loading ? "Creating..." : "Create Account"}
-                  </Button>
+                  <Field>
+                    <FieldLabel>Full Name</FieldLabel>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                  </Field>
 
-                  {/* Disabled for now */}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full mt-2"
-                    disabled
-                  >
-                    Continue with Google
-                  </Button>
+                  <Field>
+                    <FieldLabel>Email</FieldLabel>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                    <FieldDescription>
+                      We won’t share your email.
+                    </FieldDescription>
+                  </Field>
 
-                  <FieldDescription className="text-center">
-                    Already have an account?{" "}
-                    <Link href="/auth/login" className="underline">
-                      Sign in
-                    </Link>
-                  </FieldDescription>
-                </Field>
+                  <Field>
+                    <FieldLabel>Password</FieldLabel>
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                  </Field>
 
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
+                  <Field>
+                    <FieldLabel>Confirm Password</FieldLabel>
+                    <Input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="h-10"
+                    />
+                  </Field>
+
+                  {error && (
+                    <p className="text-sm text-red-500 text-center">{error}</p>
+                  )}
+
+                  <Field className="space-y-3">
+
+                    <Button
+                      type="submit"
+                      className="w-full h-10 font-semibold"
+                      disabled={loading}
+                    >
+                      {loading ? "Creating account..." : "Create Account"}
+                    </Button>
+
+                    {/* Disabled Google button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-10"
+                      disabled
+                    >
+                      Continue with Google
+                    </Button>
+
+                    <FieldDescription className="text-center text-sm text-muted-foreground">
+                      Already have an account?{" "}
+                      <Link
+                        href="/auth/login"
+                        className="font-medium text-emerald-500 hover:underline"
+                      >
+                        Sign in
+                      </Link>
+                    </FieldDescription>
+
+                  </Field>
+
+                </FieldGroup>
+              </form>
+            </CardContent>
+
+          </Card>
       </div>
     </div>
   )

@@ -8,14 +8,14 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 
-import { ProfileHeader }  from "../../components/profile/ProfileHeader";
-import { ProfileInfo }    from "../../components/profile/ProfileInfo";
-import { SwachhScore }    from "../../components/profile/SwachhScore";
-import { Achievements }   from "../../components/profile/Achievements";
-import { ActivityStats }  from "../../components/profile/ActivityStats";
-import { NftBadges }      from "../../components/profile/NftBadges";
+import { ProfileHeader }  from "@/components/profile/ProfileHeader";
+import { ProfileInfo }    from "@/components/profile/ProfileInfo";
+import { SwachhScore }    from "@/components/profile/SwachhScore";
+import { Achievements }   from "@/components/profile/Achievements";
+import { ActivityStats }  from "@/components/profile/ActivityStats";
+import { NftBadges }      from "@/components/profile/NftBadges";
 
-import { BADGES, ACTIVITY_STATS } from "../../data/profile/mock";
+import { BADGES, ACTIVITY_STATS } from "@/data/profile/mock";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ export default function Profile() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-background transition-colors duration-300">
       <div className="max-w-2xl mx-auto pb-16">
 
-        <ProfileHeader />
+        <ProfileHeader onLogout={handleLogout} />
 
         <div className="px-6 pt-6 space-y-6">
           <ProfileInfo

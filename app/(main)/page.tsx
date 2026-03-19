@@ -4,16 +4,15 @@ import { useCallback, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
-import { PageHeader }     from "../components/home/PageHeader";
-import { StatsOverview }  from "../components/home/StatsOverview";
-import { NearbyHotspots } from "../components/home/NearbyHotspots";
-import { LiveReports }    from "../components/home/LiveReports";
-import { Leaderboard }    from "../components/home/Leaderboard";
-import { DailyGoal }      from "../components/home/DailyGoal";
+import { PageHeader }     from "@/components/home/PageHeader";
+import { StatsOverview }  from "@/components/home/StatsOverview";
+import { NearbyHotspots } from "@/components/home/NearbyHotspots";
+import { LiveReports }    from "@/components/home/LiveReports";
+import { Leaderboard }    from "@/components/home/Leaderboard";
+import { DailyGoal }      from "@/components/home/DailyGoal";
 
-import { HOTSPOTS, LIVE_REPORTS, TOP_CONTRIBUTORS } from "../data/home/mock";
-import type { UserStats } from "../lib/home/type";
-
+import { HOTSPOTS, LIVE_REPORTS, TOP_CONTRIBUTORS } from "@/data/home/mock";
+import type { UserStats } from "@/lib/home/type";
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {

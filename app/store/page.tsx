@@ -1,6 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,9 +57,6 @@ export default function Store() {
               Volunteer Store
             </h1>
             <div className="flex items-center gap-2">
-              {/* Dark mode toggle */}
-              <ThemeToggle />
-
               {/* Cart icon with badge */}
               <div className="relative">
                 <button

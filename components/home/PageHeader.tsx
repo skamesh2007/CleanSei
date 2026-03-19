@@ -1,5 +1,4 @@
 import { RefreshCw, Leaf } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import type { UserStats } from "../../lib/home/type";
 
 type Props = {
@@ -47,7 +46,6 @@ export function PageHeader({ displayName, stats, refreshing, onRefresh }: Props)
 
         {/* ── Controls + Avatar ── */}
         <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-          <ThemeToggle />
           <div className="relative">
             <img
               src="/images/profile-placeholder.png"

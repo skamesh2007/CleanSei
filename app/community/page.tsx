@@ -1,7 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -71,7 +69,6 @@ export default function Community() {
             </div>
             <div className="flex items-center gap-2">
               {/* Dark mode toggle */}
-              <ThemeToggle />
               <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
                 <MessageCircle size={20} className="text-blue-600 dark:text-blue-400" />
               </div>

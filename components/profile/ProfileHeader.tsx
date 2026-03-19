@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Settings } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SettingsSheet } from "../../components/profile/Settingssheet";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -25,7 +24,6 @@ export function ProfileHeader({ onEditProfile, onLogout }: Props) {
             Profile
           </h1>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <button
               aria-label="Settings"
               onClick={() => setSettingsOpen(true)}

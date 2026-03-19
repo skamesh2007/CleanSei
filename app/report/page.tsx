@@ -1,7 +1,5 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
-
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -272,7 +270,7 @@ export default function Report() {
           Report Waste
         </h1>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          
           <div className="w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center">
             <Camera size={20} className="text-blue-600 dark:text-blue-400" />
           </div>

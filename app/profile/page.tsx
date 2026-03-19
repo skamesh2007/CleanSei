@@ -53,7 +53,7 @@ export default function Profile() {
 
           <SwachhScore
             score={240}
-            rank="Rank: #3 in Chennai"
+            rank="Rank 3"
             level="Gold"
             nextLevelLabel="Platinum"
             nextLevelScore={300}

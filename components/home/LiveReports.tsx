@@ -1,10 +1,15 @@
-import { MapPin, Clock, ChevronRight, Inbox } from "lucide-react";
-import { Badge }     from "@/components/ui/badge";
-import { Skeleton }  from "@/components/ui/skeleton";
-import { getStatusConfig } from "../../lib/home/utils";
-import type { LiveReport } from "../../lib/home/type";
+"use client";
 
-// ─── Type config ──────────────────────────────────────────────────────────────
+import { motion } from "framer-motion";
+import { MapPin, Clock, ChevronRight, Inbox } from "lucide-react";
+import { Badge }    from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ReportModal }      from "@/components/home/ReportModal";
+import { useReportModal }   from "@/lib/home/UseReportModal";
+import { getStatusConfig }  from "../../lib/home/utils";
+import type { LiveReport }  from "../../lib/home/type";
+
+// ─── Type color config ────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<string, { bg: string; text: string }> = {
   plastic:    { bg: "bg-orange-500/10",  text: "text-orange-500"       },
@@ -18,8 +23,8 @@ const TYPE_CONFIG: Record<string, { bg: string; text: string }> = {
   other:      { bg: "bg-muted",          text: "text-muted-foreground" },
 };
 
-const getTypeConfig = (type: string) =>
-  TYPE_CONFIG[type.toLowerCase()] ?? { bg: "bg-muted", text: "text-muted-foreground" };
+const getTypeConfig = (t: string) =>
+  TYPE_CONFIG[t.toLowerCase()] ?? TYPE_CONFIG.other;
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -33,77 +38,99 @@ type Props = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function LiveReports({ reports, loading, error, onSeeAll }: Props) {
+  const { selected, open, close } = useReportModal();
+
   return (
-    <section className="mt-8">
+    <>
+      <section className="mt-8">
 
-      {/* ── Section header ── */}
-      <div className="flex items-center justify-between px-5 mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-foreground">Live Reports</h2>
-          <p className="text-muted-foreground text-xs mt-0.5">Recently reported issues</p>
+        {/* ── Header ── */}
+        <div className="flex items-center justify-between px-5 mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">Live Reports</h2>
+            <p className="text-muted-foreground text-xs mt-0.5">Tap a card to see details</p>
+          </div>
+          <button
+            onClick={onSeeAll}
+            className="flex items-center gap-1 text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+          >
+            See all <ChevronRight size={14} />
+          </button>
         </div>
-        <button
-          onClick={onSeeAll}
-          className="flex items-center gap-1 text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
-        >
-          See all <ChevronRight size={14} />
-        </button>
-      </div>
 
-      {/* ── Loading skeletons ── */}
-      {loading && (
-        <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-52 flex-shrink-0 space-y-2">
-              <Skeleton className="w-full h-28 rounded-xl" />
-              <Skeleton className="h-3 w-3/4 rounded" />
-              <Skeleton className="h-3 w-1/2 rounded" />
-            </div>
-          ))}
-        </div>
-      )}
+        {/* ── Loading ── */}
+        {loading && (
+          <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-52 flex-shrink-0 space-y-2">
+                <Skeleton className="w-full h-28 rounded-xl" />
+                <Skeleton className="h-3 w-3/4 rounded" />
+                <Skeleton className="h-3 w-1/2 rounded" />
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* ── Error state ── */}
-      {!loading && error && (
-        <div className="px-5">
-          <p className="text-sm text-destructive">{error}</p>
-        </div>
-      )}
+        {/* ── Error ── */}
+        {!loading && error && (
+          <p className="px-5 text-sm text-destructive">{error}</p>
+        )}
 
-      {/* ── Empty state ── */}
-      {!loading && !error && reports.length === 0 && (
-        <div className="px-5 flex flex-col items-center justify-center py-10 text-center gap-2">
-          <Inbox size={32} className="text-muted-foreground/40" />
-          <p className="text-sm text-muted-foreground">No reports yet.</p>
-          <p className="text-xs text-muted-foreground/60">
-            Be the first to report waste in your area!
-          </p>
-        </div>
-      )}
+        {/* ── Empty ── */}
+        {!loading && !error && reports.length === 0 && (
+          <div className="px-5 flex flex-col items-center justify-center py-10 text-center gap-2">
+            <Inbox size={32} className="text-muted-foreground/40" />
+            <p className="text-sm text-muted-foreground">No reports yet.</p>
+            <p className="text-xs text-muted-foreground/60">
+              Be the first to report waste in your area!
+            </p>
+          </div>
+        )}
 
-      {/* ── Cards ── */}
-      {!loading && !error && reports.length > 0 && (
-        <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {reports.map((item) => (
-            <ReportCard key={item.id} report={item} />
-          ))}
-        </div>
-      )}
-    </section>
+        {/* ── Cards ── */}
+        {!loading && !error && reports.length > 0 && (
+          <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {reports.map((item) => (
+              <ReportCard
+                key={item.id}
+                report={item}
+                onClick={() => open(item)}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── Modal (portal-like, rendered outside section) ── */}
+      <ReportModal report={selected} onClose={close} />
+    </>
   );
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-function ReportCard({ report }: { report: LiveReport }) {
+function ReportCard({
+  report,
+  onClick,
+}: {
+  report:  LiveReport;
+  onClick: () => void;
+}) {
   const { badge, dot, label } = getStatusConfig(report.status);
-  const typeConfig = getTypeConfig(report.type ?? "other");
+  const tc = getTypeConfig(report.type ?? "other");
 
   return (
-    <button className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left hover:border-border/60 hover:-translate-y-0.5 hover:bg-accent/40 transition-all group">
-
+    <motion.button
+      layoutId={`card-${report.id}`}
+      onClick={onClick}
+      className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left group"
+      style={{ originX: 0.5, originY: 0.5 }}
+      whileHover={{ y: -3, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.9 }}
+    >
       {/* ── Image ── */}
-      <div className="relative">
+      <motion.div layoutId={`img-${report.id}`} className="relative" transition={{ type: "spring", stiffness: 380, damping: 32 }}>
         {report.img ? (
           <img
             src={report.img}
@@ -121,22 +148,28 @@ function ReportCard({ report }: { report: LiveReport }) {
         )}
 
         {/* Status badge */}
-        <span
+        <motion.span
+          layoutId={`status-${report.id}`}
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
           className={`absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badge}`}
         >
           <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
           {label}
-        </span>
-      </div>
+        </motion.span>
+      </motion.div>
 
       {/* ── Content ── */}
       <div className="mt-2.5">
-        <p className="text-sm font-semibold text-foreground truncate group-hover:text-emerald-500 transition-colors">
+        <motion.p
+          layoutId={`title-${report.id}`}
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+          className="text-sm font-semibold text-foreground truncate group-hover:text-emerald-500 transition-colors"
+        >
           {report.title}
-        </p>
+        </motion.p>
 
         <Badge
-          className={`mt-1.5 text-[10px] font-semibold px-2 py-0 h-4 border-0 rounded-full ${typeConfig.bg} ${typeConfig.text}`}
+          className={`mt-1.5 text-[10px] font-semibold px-2 py-0 h-4 border-0 rounded-full ${tc.bg} ${tc.text}`}
         >
           {report.type ?? "General"}
         </Badge>
@@ -152,6 +185,6 @@ function ReportCard({ report }: { report: LiveReport }) {
           </span>
         </div>
       </div>
-    </button>
+    </motion.button>
   );
 }

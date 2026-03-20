@@ -1,22 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useLocation } from "@/lib/report/useLocation";
-import { useCamera } from "@/lib/report/useCamera";
-import { useReport } from "@/lib/report/useReport";
-import { LocationBar } from "./LocationBar";
-import { IdlePrompt } from "./Idleprompt";
-import { CameraView } from "./CameraView";
+import { useLocation }  from "@/lib/report/useLocation";
+import { useCamera }    from "@/lib/report/useCamera";
+import { useReport }    from "@/lib/report/useReport";
+import { LocationBar }  from "./LocationBar";
+import { IdlePrompt }   from "./Idleprompt";
+import { CameraView }   from "./CameraView";
 import { PhotoPreview } from "./PhotoPreview";
-import { SuccessView } from "./SuccessView";
-import type { WasteType } from "@/lib/report/types";
+import { SuccessView }  from "./SuccessView";
+import type { WasteType,Severity } from "@/lib/report/types";
 
 export function ReportPage() {
-  const [note, setNote] = useState("");
+  const [note,         setNote]         = useState("");
   const [selectedType, setSelectedType] = useState<WasteType | null>(null);
+  const [severity,     setSeverity]     = useState<Severity>("medium");
 
   const { locationStatus, locationLabel } = useLocation();
-  const { loading, submitted, pointsEarned, submitReport, resetReport } = useReport();
+
+  const {
+    step,
+    loading,
+    submitted,
+    pointsEarned,
+    error,
+    submitReport,
+    resetReport,
+  } = useReport();
+
   const {
     cameraMode,
     cameraError,
@@ -34,11 +45,17 @@ export function ReportPage() {
     resetReport();
     setNote("");
     setSelectedType(null);
+    setSeverity("medium");
   };
 
   const handleTypeSelect = (type: WasteType) => {
     setSelectedType(type);
     if (!note) setNote(type);
+  };
+
+  const handleSubmit = () => {
+    if (!photo || !selectedType) return;
+    submitReport(photo, note, selectedType, severity, locationLabel);
   };
 
   if (submitted) {
@@ -67,11 +84,15 @@ export function ReportPage() {
           photo={photo}
           note={note}
           selectedType={selectedType}
+          severity={severity}
           loading={loading}
+          step={step}
+          error={error}
           onNoteChange={setNote}
           onTypeSelect={handleTypeSelect}
+          onSeverity={setSeverity}
           onRetake={handleReset}
-          onSubmit={() => submitReport(photo, note)}
+          onSubmit={handleSubmit}
         />
       )}
     </div>

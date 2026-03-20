@@ -12,8 +12,9 @@ import { Leaderboard }    from "@/components/home/Leaderboard";
 import { DailyGoal }      from "@/components/home/DailyGoal";
 import { Skeleton }       from "@/components/ui/skeleton";
 
-import { HOTSPOTS, LIVE_REPORTS, TOP_CONTRIBUTORS } from "@/data/home/mock";
-import type { UserStats } from "@/lib/home/type";
+import { useLiveReports }              from "@/lib/home/UseliveReports";
+import { HOTSPOTS, TOP_CONTRIBUTORS }  from "@/data/home/mock";   // mock removed for live reports
+import type { UserStats }              from "@/lib/home/type";
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
@@ -26,6 +27,9 @@ export default function Home() {
     cleanups: 8,
     points:   340,
   });
+
+  // ── Real-time reports from Firestore ──
+  const { reports, loading: reportsLoading, error: reportsError } = useLiveReports();
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth/login");
@@ -57,10 +61,20 @@ export default function Home() {
           refreshing={refreshing}
           onRefresh={handleRefresh}
         />
+
         <StatsOverview  stats={userStats} />
+
         <NearbyHotspots hotspots={HOTSPOTS} />
-        <LiveReports    reports={LIVE_REPORTS} />
+
+        {/* ── Live from Firestore ── */}
+        <LiveReports
+          reports={reports}
+          loading={reportsLoading}
+          error={reportsError}
+        />
+
         <Leaderboard    contributors={TOP_CONTRIBUTORS} />
+
         <DailyGoal      current={1} target={2} reward={50} />
       </div>
     </div>

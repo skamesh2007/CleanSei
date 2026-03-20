@@ -1,25 +1,38 @@
-import { MapPin, Clock, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { MapPin, Clock, ChevronRight, Inbox } from "lucide-react";
+import { Badge }     from "@/components/ui/badge";
+import { Skeleton }  from "@/components/ui/skeleton";
 import { getStatusConfig } from "../../lib/home/utils";
 import type { LiveReport } from "../../lib/home/type";
 
-type Props = {
-  reports:  LiveReport[];
-  onSeeAll?: () => void;
-};
+// ─── Type config ──────────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<string, { bg: string; text: string }> = {
-  plastic:    { bg: "bg-orange-500/10",  text: "text-orange-500"  },
-  mixed:      { bg: "bg-emerald-500/10", text: "text-emerald-500" },
+  plastic:    { bg: "bg-orange-500/10",  text: "text-orange-500"       },
+  paper:      { bg: "bg-sky-500/10",     text: "text-sky-500"          },
+  glass:      { bg: "bg-cyan-500/10",    text: "text-cyan-500"         },
+  metal:      { bg: "bg-slate-500/10",   text: "text-slate-500"        },
+  mixed:      { bg: "bg-emerald-500/10", text: "text-emerald-500"      },
   concrete:   { bg: "bg-muted",          text: "text-muted-foreground" },
-  organic:    { bg: "bg-green-500/10",   text: "text-green-500"   },
-  electronic: { bg: "bg-violet-500/10",  text: "text-violet-500"  },
+  organic:    { bg: "bg-green-500/10",   text: "text-green-500"        },
+  electronic: { bg: "bg-violet-500/10",  text: "text-violet-500"       },
+  other:      { bg: "bg-muted",          text: "text-muted-foreground" },
 };
 
 const getTypeConfig = (type: string) =>
   TYPE_CONFIG[type.toLowerCase()] ?? { bg: "bg-muted", text: "text-muted-foreground" };
 
-export function LiveReports({ reports, onSeeAll }: Props) {
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+type Props = {
+  reports:   LiveReport[];
+  loading?:  boolean;
+  error?:    string | null;
+  onSeeAll?: () => void;
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function LiveReports({ reports, loading, error, onSeeAll }: Props) {
   return (
     <section className="mt-8">
 
@@ -37,35 +50,75 @@ export function LiveReports({ reports, onSeeAll }: Props) {
         </button>
       </div>
 
-      {/* ── Horizontal scroll ── */}
-      <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {reports.map((item) => (
-          <ReportCard key={item.id} report={item} />
-        ))}
-      </div>
+      {/* ── Loading skeletons ── */}
+      {loading && (
+        <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="w-52 flex-shrink-0 space-y-2">
+              <Skeleton className="w-full h-28 rounded-xl" />
+              <Skeleton className="h-3 w-3/4 rounded" />
+              <Skeleton className="h-3 w-1/2 rounded" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Error state ── */}
+      {!loading && error && (
+        <div className="px-5">
+          <p className="text-sm text-destructive">{error}</p>
+        </div>
+      )}
+
+      {/* ── Empty state ── */}
+      {!loading && !error && reports.length === 0 && (
+        <div className="px-5 flex flex-col items-center justify-center py-10 text-center gap-2">
+          <Inbox size={32} className="text-muted-foreground/40" />
+          <p className="text-sm text-muted-foreground">No reports yet.</p>
+          <p className="text-xs text-muted-foreground/60">
+            Be the first to report waste in your area!
+          </p>
+        </div>
+      )}
+
+      {/* ── Cards ── */}
+      {!loading && !error && reports.length > 0 && (
+        <div className="flex gap-2.5 overflow-x-auto pb-2 px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {reports.map((item) => (
+            <ReportCard key={item.id} report={item} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
 function ReportCard({ report }: { report: LiveReport }) {
   const { badge, dot, label } = getStatusConfig(report.status);
-  const typeConfig = getTypeConfig(report.type ?? "mixed");
+  const typeConfig = getTypeConfig(report.type ?? "other");
 
   return (
     <button className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left hover:border-border/60 hover:-translate-y-0.5 hover:bg-accent/40 transition-all group">
 
-      {/* ── Image + status badge ── */}
+      {/* ── Image ── */}
       <div className="relative">
-        <img
-          src={report.img}
-          alt={report.title}
-          className="w-full h-28 rounded-xl object-cover bg-muted block"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://placehold.co/208x112?text=${encodeURIComponent(
-              report.title
-            )}`;
-          }}
-        />
+        {report.img ? (
+          <img
+            src={report.img}
+            alt={report.title}
+            className="w-full h-28 rounded-xl object-cover bg-muted block"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                `https://placehold.co/208x112?text=${encodeURIComponent(report.title)}`;
+            }}
+          />
+        ) : (
+          <div className="w-full h-28 rounded-xl bg-muted flex items-center justify-center">
+            <Inbox size={24} className="text-muted-foreground/30" />
+          </div>
+        )}
 
         {/* Status badge */}
         <span
@@ -89,11 +142,11 @@ function ReportCard({ report }: { report: LiveReport }) {
         </Badge>
 
         <div className="flex items-center justify-between mt-2">
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <MapPin size={9} />
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground truncate max-w-[100px]">
+            <MapPin size={9} className="flex-shrink-0" />
             {report.location}
           </span>
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground flex-shrink-0">
             <Clock size={9} />
             {report.time}
           </span>

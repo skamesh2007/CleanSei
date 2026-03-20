@@ -1,32 +1,32 @@
-export type Severity = "high" | "medium" | "low";
+import type { WasteType, ReportStatus, Severity } from "@/lib/report/types";
 
-export type ReportStatus =
-  | "resolved"
-  | "in_progress"
-  | "pending"
-  | "unknown";
+// ─── Hotspot ──────────────────────────────────────────────────────────────────
 
 export type Hotspot = {
-  id: number;
+  id: string;
   latitude: number;
   longitude: number;
   title: string;
   severity: Severity;
-  type: string;
+  type: WasteType;
   distance?: string;
   time?: string;
   image?: string;
 };
 
+// ─── Live Report ──────────────────────────────────────────────────────────────
+
 export type LiveReport = {
-  id: number;
+  id: string;
   img: string;
   title: string;
   status: ReportStatus;
   time: string;
   location: string;
-  type?: string; // ✅ merged properly
+  type: WasteType; 
 };
+
+// ─── Contributor ──────────────────────────────────────────────────────────────
 
 export type Contributor = {
   name: string;
@@ -35,6 +35,8 @@ export type Contributor = {
   level: string;
   isCurrentUser?: boolean;
 };
+
+// ─── User Stats ───────────────────────────────────────────────────────────────
 
 export type UserStats = {
   reports: number;

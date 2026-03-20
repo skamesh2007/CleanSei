@@ -1,4 +1,15 @@
-import { Recycle, Newspaper, GlassWater, Wrench, Leaf, Cpu, HelpCircle } from "lucide-react";
+import type { Timestamp } from "firebase/firestore";
+import {
+  Recycle,
+  Newspaper,
+  GlassWater,
+  Wrench,
+  Leaf,
+  Cpu,
+  HelpCircle,
+} from "lucide-react";
+
+// ─── Waste Types ──────────────────────────────────────────────────────────────
 
 export const WASTE_TYPES = [
   { label: "Plastic",    icon: Recycle    },
@@ -12,7 +23,10 @@ export const WASTE_TYPES = [
 
 export type WasteType = (typeof WASTE_TYPES)[number]["label"];
 
+// ─── Camera / UI state ────────────────────────────────────────────────────────
+
 export interface PhotoData {
+  /** base64 data-URI from canvas — used locally only, never stored */
   uri: string;
   lat: number | null;
   lng: number | null;
@@ -26,3 +40,34 @@ export type LocationStatus =
   | { state: "granted"; lat: number; lng: number }
   | { state: "denied" }
   | { state: "unavailable" };
+
+// ─── Firestore document shape ─────────────────────────────────────────────────
+
+export type Severity = "low" | "medium" | "high";
+
+export type ReportStatus = "pending" | "in_progress" | "resolved";
+
+export interface WasteReport {
+  /** Cloudinary secure_url array */
+  images: string[];
+
+  description: string;
+
+  wasteType: WasteType;
+
+  severity: Severity;
+
+  status: ReportStatus;
+
+  location: {
+    lat: number | null;
+    lng: number | null;
+    label: string;
+  };
+
+  reportedBy: string; // Firebase Auth uid
+
+  timestamp: Timestamp | Date;
+
+  pointsEarned: number;
+}

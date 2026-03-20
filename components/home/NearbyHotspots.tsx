@@ -1,9 +1,21 @@
+"use client";
+
+import dynamic         from "next/dynamic";
 import { ChevronRight, MapPin, Clock, MapPinOff } from "lucide-react";
 import { Badge }     from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton }  from "@/components/ui/skeleton";
-import { getSeverityColor, toMapPercent } from "../../lib/home/utils";
+import { getSeverityColor } from "../../lib/home/utils";
 import type { Hotspot } from "../../lib/home/type";
+
+// Dynamic import — Leaflet touches `window` on load, must be client-only
+const HotspotsMap = dynamic(
+  () => import("@/components/home/Hotspotsmap").then((m) => m.HotspotsMap),
+  {
+    ssr:     false,
+    loading: () => <Skeleton className="w-full h-[180px] rounded-none" />,
+  }
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,10 +58,10 @@ export function NearbyHotspots({ hotspots, loading, error, onViewAll }: Props) {
         </button>
       </div>
 
-      {/* ── Loading skeleton ── */}
+      {/* ── Loading ── */}
       {loading && (
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
-          <Skeleton className="w-full h-40 rounded-none" />
+          <Skeleton className="w-full h-[180px] rounded-none" />
           <Separator />
           <div className="divide-y divide-border">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -86,42 +98,10 @@ export function NearbyHotspots({ hotspots, loading, error, onViewAll }: Props) {
       {!loading && !error && hotspots.length > 0 && (
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
 
-          {/* Map */}
-          <div className="relative w-full h-40">
-            <iframe
-              title="Hotspots Map"
-              width="100%"
-              height="100%"
-              style={{ border: 0, filter: "grayscale(0.5) contrast(1.1)" }}
-              loading="lazy"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=80.265%2C13.078%2C80.280%2C13.092&layer=mapnik&marker=13.0827%2C80.2707"
-            />
-
-            {/* Severity pins */}
-            {hotspots.map((spot) => {
-              const pos   = toMapPercent(spot.latitude, spot.longitude);
-              const color = getSeverityColor(spot.severity);
-              return (
-                <div
-                  key={spot.id}
-                  className="absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-                  title={spot.title}
-                >
-                  <div
-                    className="w-3.5 h-3.5 rounded-full border-2 border-background relative z-10"
-                    style={{ backgroundColor: color }}
-                  />
-                  <div
-                    className="absolute inset-0 rounded-full animate-ping opacity-60"
-                    style={{ backgroundColor: color }}
-                  />
-                </div>
-              );
-            })}
-
-            {/* Active count pill */}
-            <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-background/85 border border-border rounded-lg px-2.5 py-1">
+          {/* Active count pill — sits above the map */}
+          <div className="relative">
+            <HotspotsMap hotspots={hotspots} height={180} />
+            <div className="absolute top-2.5 left-2.5 z-[1000] flex items-center gap-1.5 bg-background/90 border border-border rounded-lg px-2.5 py-1 pointer-events-none">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[11px] font-semibold text-foreground">
                 {activeCount} active

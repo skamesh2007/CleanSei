@@ -1,4 +1,4 @@
-import type { ReportStatus, Severity } from "../../lib/home/type";
+import type { ReportStatus, Severity } from "@/lib/report/types";
 
 export const getStatusConfig = (status: ReportStatus) => {
   const map: Record<string, { badge: string; dot: string; label: string }> = {

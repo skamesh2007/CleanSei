@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { uploadToCloudinary, CloudinaryUploadError } from "./UploadToCloudinary";
 import { submitToFirestore } from "./SubmitToFirestore";
 import type { PhotoData, Severity } from "@/lib/report/types";
+import type { WasteType } from "@/lib/report/types";
 
 export type SubmitStep =
   | "idle"
@@ -21,7 +22,7 @@ export interface UseReportReturn {
   submitReport: (
     photo:       PhotoData,
     description: string,
-    wasteType:   string,
+    wasteType:   WasteType,
     severity:    Severity,
     locationLabel: string
   ) => Promise<void>;
@@ -39,7 +40,7 @@ export function useReport(): UseReportReturn {
   const submitReport = async (
     photo:         PhotoData,
     description:   string,
-    wasteType:     string,
+    wasteType:     WasteType,
     severity:      Severity,
     locationLabel: string
   ) => {

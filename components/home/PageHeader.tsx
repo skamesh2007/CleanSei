@@ -11,17 +11,13 @@ import {
 } from "@/components/ui/tooltip";
 import type { UserStats } from "../../lib/home/type";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type Props = {
   displayName: string | null;
-  photoURL?: string | null;
-  stats: UserStats;
-  refreshing: boolean;
-  onRefresh: () => void;
+  photoURL?:   string | null;
+  stats:       UserStats;
+  refreshing:  boolean;
+  onRefresh:   () => void;
 };
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export function PageHeader({
   displayName,
@@ -40,8 +36,8 @@ export function PageHeader({
 
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
-    day: "numeric",
-    month: "long",
+    day:     "numeric",
+    month:   "long",
   });
 
   return (
@@ -54,25 +50,25 @@ export function PageHeader({
 
             {/* Brand */}
             <div className="flex items-center gap-2 mb-1">
-              <Leaf size={14} className="text-emerald-400" />
-              <span className="text-xs font-semibold tracking-widest uppercase text-emerald-400">
+              <Leaf size={14} className="text-emerald-500" />
+              <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500">
                 CleanSei
               </span>
             </div>
 
             {/* Name */}
-            <h1 className="text-3xl font-bold text-white leading-tight tracking-tight">
+            <h1 className="text-3xl font-bold text-foreground leading-tight tracking-tight">
               {firstName}
             </h1>
 
             {/* Date */}
-            <p className="text-zinc-400 text-sm mt-0.5">{today}</p>
+            <p className="text-muted-foreground text-sm mt-0.5">{today}</p>
 
             {/* Badges */}
             <div className="flex items-center gap-2 mt-3 flex-wrap">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge className="gap-1.5 text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/15 text-amber-300 border border-amber-500/20 rounded-full px-3 py-1 cursor-default">
+                  <Badge className="gap-1.5 text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/15 text-amber-500 border border-amber-500/20 rounded-full px-3 py-1 cursor-default">
                     🏆 Eco Warrior
                   </Badge>
                 </TooltipTrigger>
@@ -83,7 +79,7 @@ export function PageHeader({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge className="gap-1.5 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 rounded-full px-3 py-1 cursor-default">
+                  <Badge className="gap-1.5 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-500 border border-emerald-500/20 rounded-full px-3 py-1 cursor-default">
                     ⭐ {stats.points} pts
                   </Badge>
                 </TooltipTrigger>
@@ -96,8 +92,6 @@ export function PageHeader({
 
           {/* ── Right: avatar ── */}
           <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-
-
             <div className="relative">
               <Avatar className="w-14 h-14 rounded-2xl ring-2 ring-emerald-500/30">
                 <AvatarImage
@@ -111,7 +105,7 @@ export function PageHeader({
               </Avatar>
 
               {/* Points bubble */}
-              <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30 border-2 border-[#0a0a0f]">
+              <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30 border-2 border-background">
                 {stats.points > 999 ? "1k+" : stats.points}
               </span>
             </div>
@@ -122,7 +116,7 @@ export function PageHeader({
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="mt-4 flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50 group"
+          className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 group"
         >
           <RefreshCw
             size={11}

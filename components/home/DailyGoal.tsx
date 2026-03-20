@@ -1,9 +1,11 @@
 import { Flag, AlertCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 type Props = {
-  current: number;
-  target: number;
-  reward: number;
+  current:     number;
+  target:      number;
+  reward:      number;
   onContinue?: () => void;
 };
 
@@ -12,22 +14,23 @@ export function DailyGoal({ current, target, reward, onContinue }: Props) {
 
   return (
     <section className="mt-8 px-5">
-      <div className="bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-5">
+      <div className="bg-card border border-border rounded-2xl p-5">
+
         {/* ── Header ── */}
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-emerald-500/10 rounded-xl flex items-center justify-center">
-              <Flag size={15} className="text-emerald-400" />
+              <Flag size={15} className="text-emerald-500" />
             </div>
-            <h3 className="text-white font-bold text-base">Daily Goal</h3>
+            <h3 className="text-foreground font-bold text-base">Daily Goal</h3>
           </div>
-          <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full">
             +{reward} pts
           </span>
         </div>
 
-        <p className="text-zinc-400 text-sm mt-1 mb-5">
-          Report <strong className="text-white">{target} waste spots</strong> today to earn your reward.
+        <p className="text-muted-foreground text-sm mt-1 mb-5">
+          Report <strong className="text-foreground">{target} waste spots</strong> today to earn your reward.
         </p>
 
         {/* ── Step indicators ── */}
@@ -41,36 +44,34 @@ export function DailyGoal({ current, target, reward, onContinue }: Props) {
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                     done
                       ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-                      : "bg-zinc-800 text-zinc-500 border border-zinc-700"
+                      : "bg-muted text-muted-foreground border border-border"
                   }`}
                 >
                   {done ? "✓" : i + 1}
                 </div>
               );
             })}
-            <span className="text-zinc-400 text-xs ml-1">
+            <span className="text-muted-foreground text-xs ml-1">
               {current} of {target} completed
             </span>
           </div>
-          <span className="text-zinc-500 text-xs">{progressPct}%</span>
+          <span className="text-muted-foreground text-xs">{progressPct}%</span>
         </div>
 
         {/* ── Progress bar ── */}
-        <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-5">
-          <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-700"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
+        <Progress
+          value={progressPct}
+          className="h-1.5 mb-5 bg-muted [&>div]:bg-gradient-to-r [&>div]:from-emerald-500 [&>div]:to-emerald-400"
+        />
 
         {/* ── CTA ── */}
-        <button
+        <Button
           onClick={onContinue}
-          className="w-full bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl py-3 font-semibold text-sm transition-colors shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20"
         >
           <AlertCircle size={15} />
           Continue Mission
-        </button>
+        </Button>
       </div>
     </section>
   );

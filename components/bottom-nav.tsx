@@ -60,36 +60,29 @@ const ProfileIcon = ({ filled }: { filled: boolean }) => (
     {filled ? (
       <>
         <circle cx="12" cy="7.5" r="3.5" fill="currentColor" />
-        <path
-          d="M5 21c0-3.87 3.13-7 7-7s7 3.13 7 7H5Z"
-          fill="currentColor"
-        />
+        <path d="M5 21c0-3.87 3.13-7 7-7s7 3.13 7 7H5Z" fill="currentColor" />
       </>
     ) : (
       <>
         <circle cx="12" cy="7.5" r="3.5" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M5 21c0-3.87 3.13-7 7-7s7 3.13 7 7"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
+        <path d="M5 21c0-3.87 3.13-7 7-7s7 3.13 7 7"
+          stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </>
     )}
   </svg>
 );
 
 const tabs = [
-  { href: "/", label: "Home", Icon: HomeIcon },
+  { href: "/",          label: "Home",      Icon: HomeIcon      },
   { href: "/community", label: "Community", Icon: CommunityIcon },
-  { href: "/report", label: "Report", Icon: ReportIcon },
-  { href: "/store", label: "Store", Icon: StoreIcon },
-  { href: "/profile", label: "Profile", Icon: ProfileIcon },
+  { href: "/report",    label: "Report",    Icon: ReportIcon    },
+  { href: "/store",     label: "Store",     Icon: StoreIcon     },
+  { href: "/profile",   label: "Profile",   Icon: ProfileIcon   },
 ] as const;
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const navRef = useRef<HTMLElement>(null);
+  const navRef   = useRef<HTMLElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, ready: false });
 
@@ -98,16 +91,21 @@ export default function BottomNav() {
   );
 
   useEffect(() => {
-    const nav = navRef.current;
+    const nav  = navRef.current;
     const item = itemRefs.current[activeIndex];
     if (!nav || !item) return;
-    const navRect = nav.getBoundingClientRect();
+    const navRect  = nav.getBoundingClientRect();
     const itemRect = item.getBoundingClientRect();
     setPillStyle({ left: itemRect.left - navRect.left, width: itemRect.width, ready: true });
   }, [activeIndex]);
 
   return (
-    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
+    // ── Outer wrapper ────────────────────────────────────────────────────────
+    // translate-y-full slides the entire nav below the viewport edge.
+    // transition-transform makes it animate smoothly in both directions.
+    // [body.report-modal-open_&] targets this element when <body> has the
+    // class "report-modal-open", which useReportModal adds/removes.
+    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] [body.report-modal-open_&]:translate-y-full">
       <nav
         ref={navRef}
         className="relative w-full max-w-md rounded-[22px] border border-black/[0.06] bg-background/90 px-1.5 py-1.5 shadow-[0_4px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/[0.06]"

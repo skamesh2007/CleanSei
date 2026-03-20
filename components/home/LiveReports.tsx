@@ -1,15 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { MapPin, Clock, ChevronRight, Inbox } from "lucide-react";
 import { Badge }    from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ReportModal }      from "@/components/home/ReportModal";
-import { useReportModal }   from "@/lib/home/UseReportModal";
-import { getStatusConfig }  from "../../lib/home/utils";
-import type { LiveReport }  from "../../lib/home/type";
+import { ReportModal }     from "@/components/home/ReportModal";
+import { useReportModal }  from "@/lib/home/UseReportModal";
+import { getStatusConfig } from "../../lib/home/utils";
+import type { LiveReport } from "../../lib/home/type";
 
-// ─── Type color config ────────────────────────────────────────────────────────
+// ─── Type config ──────────────────────────────────────────────────────────────
 
 const TYPE_CONFIG: Record<string, { bg: string; text: string }> = {
   plastic:    { bg: "bg-orange-500/10",  text: "text-orange-500"       },
@@ -101,13 +100,21 @@ export function LiveReports({ reports, loading, error, onSeeAll }: Props) {
         )}
       </section>
 
-      {/* ── Modal (portal-like, rendered outside section) ── */}
       <ReportModal report={selected} onClose={close} />
     </>
   );
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
+/*
+  FIX 5: Removed motion.button + layoutId from every card.
+  Each card having layoutId creates a Framer Motion node that constantly
+  tracks its position via ResizeObserver even while nothing is animating.
+  With 10-20 cards that's 10-20 observers running during scroll.
+
+  Replaced with a plain <button> + CSS active:scale for tap feedback.
+  This is instant — no JS involved, handled entirely by the browser compositor.
+*/
 
 function ReportCard({
   report,
@@ -120,17 +127,12 @@ function ReportCard({
   const tc = getTypeConfig(report.type ?? "other");
 
   return (
-    <motion.button
-      layoutId={`card-${report.id}`}
+    <button
       onClick={onClick}
-      className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left group"
-      style={{ originX: 0.5, originY: 0.5 }}
-      whileHover={{ y: -3, transition: { type: "spring", stiffness: 400, damping: 25 } }}
-      whileTap={{ scale: 0.97 }}
-      transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.9 }}
+      className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left active:scale-[0.97] transition-transform duration-100 group"
     >
-      {/* ── Image ── */}
-      <motion.div layoutId={`img-${report.id}`} className="relative" transition={{ type: "spring", stiffness: 380, damping: 32 }}>
+      {/* Image */}
+      <div className="relative">
         {report.img ? (
           <img
             src={report.img}
@@ -148,25 +150,19 @@ function ReportCard({
         )}
 
         {/* Status badge */}
-        <motion.span
-          layoutId={`status-${report.id}`}
-          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+        <span
           className={`absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badge}`}
         >
           <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dot}`} />
           {label}
-        </motion.span>
-      </motion.div>
+        </span>
+      </div>
 
-      {/* ── Content ── */}
+      {/* Content */}
       <div className="mt-2.5">
-        <motion.p
-          layoutId={`title-${report.id}`}
-          transition={{ type: "spring", stiffness: 380, damping: 32 }}
-          className="text-sm font-semibold text-foreground truncate group-hover:text-emerald-500 transition-colors"
-        >
+        <p className="text-sm font-semibold text-foreground truncate group-active:text-emerald-500 transition-colors">
           {report.title}
-        </motion.p>
+        </p>
 
         <Badge
           className={`mt-1.5 text-[10px] font-semibold px-2 py-0 h-4 border-0 rounded-full ${tc.bg} ${tc.text}`}
@@ -185,6 +181,6 @@ function ReportCard({
           </span>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 }

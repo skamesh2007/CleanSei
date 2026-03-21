@@ -7,6 +7,9 @@ import { ReportModal }     from "@/components/home/ReportModal";
 import { useReportModal }  from "@/lib/home/UseReportModal";
 import { getStatusConfig } from "../../lib/home/utils";
 import type { LiveReport } from "../../lib/home/type";
+import { getLocationName } from "@/lib/home/getLocationName";
+import { useEffect, useState } from "react";
+import { get } from "node:http";
 
 // ─── Type config ──────────────────────────────────────────────────────────────
 
@@ -123,13 +126,40 @@ function ReportCard({
   report:  LiveReport;
   onClick: () => void;
 }) {
+
+  const [locationName, setLocationName] = useState("Loading...");
   const { badge, dot, label } = getStatusConfig(report.status);
   const tc = getTypeConfig(report.type ?? "other");
+
+  useEffect(() => {
+    if (!report.location) {
+      setLocationName("Unknown");
+      return;
+    }
+
+    const [lat, lon] = report.location.split(",").map((v) => Number(v.trim()));
+
+    if (!lat || !lon) {
+      setLocationName("Unknown");
+      return;
+    }
+
+    async function fetchLocation() {
+      try {
+        const name = await getLocationName(lat, lon);
+        setLocationName(name);
+      } catch {
+        setLocationName("Unknown");
+      }
+    }
+
+    fetchLocation();
+  }, [report.location]);
 
   return (
     <button
       onClick={onClick}
-      className="bg-card border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left active:scale-[0.97] transition-transform duration-100 group"
+      className="bg-card cursor-pointer border border-border rounded-2xl p-3 w-52 flex-shrink-0 text-left active:scale-[0.97] transition-transform duration-100 group"
     >
       {/* Image */}
       <div className="relative">
@@ -173,7 +203,7 @@ function ReportCard({
         <div className="flex items-center justify-between mt-2">
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground truncate max-w-[100px]">
             <MapPin size={9} className="flex-shrink-0" />
-            {report.location}
+            {locationName}
           </span>
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground flex-shrink-0">
             <Clock size={9} />

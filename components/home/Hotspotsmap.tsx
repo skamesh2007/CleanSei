@@ -13,41 +13,44 @@ function getColor(severity: string) {
   return SEVERITY_COLOR[severity] ?? SEVERITY_COLOR.low;
 }
 
-function makePinSvg(color: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
-    <ellipse cx="14" cy="34" rx="5" ry="2" fill="rgba(0,0,0,0.20)" />
-    <path d="M14 0C7.373 0 2 5.373 2 12c0 8 12 24 12 24S26 20 26 12C26 5.373 20.627 0 14 0Z"
-      fill="${color}" stroke="white" stroke-width="1.8" />
-    <circle cx="14" cy="12" r="5" fill="white" opacity="0.9" />
+function makePinSvg(color: string, highlighted = false): string {
+  const scale = highlighted ? 1.35 : 1;
+  const w = Math.round(28 * scale);
+  const h = Math.round(36 * scale);
+  const ring = highlighted
+    ? `<circle cx="${w / 2}" cy="${h * 0.33}" r="${w * 0.42}" fill="none" stroke="${color}" stroke-width="2.5" opacity="0.35"/>`
+    : "";
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    ${ring}
+    <ellipse cx="${w / 2}" cy="${h - 2}" rx="${w * 0.18}" ry="${h * 0.056}" fill="rgba(0,0,0,0.22)" />
+    <path d="M${w / 2} 0C${w * 0.263} 0 ${w * 0.071} ${h * 0.149} ${w * 0.071} ${h * 0.333}c0 ${h * 0.222} ${w * 0.429} ${h * 0.667} ${w * 0.429} ${h * 0.667}S${w * 0.929} ${h * 0.556} ${w * 0.929} ${h * 0.333}C${w * 0.929} ${h * 0.149} ${w * 0.737} 0 ${w / 2} 0Z"
+      fill="${color}" stroke="white" stroke-width="${highlighted ? 2.2 : 1.8}" />
+    <circle cx="${w / 2}" cy="${h * 0.333}" r="${w * 0.178}" fill="white" opacity="0.92" />
   </svg>`;
 }
 
 interface HotspotsMapProps {
-  hotspots: Hotspot[];
-  height?:  number;
+  hotspots:    Hotspot[];
+  selectedId?: string | null;
+  height?:     number;
 }
 
-export function HotspotsMap({ hotspots, height = 180 }: HotspotsMapProps) {
+export function HotspotsMap({ hotspots, selectedId, height = 180 }: HotspotsMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef       = useRef<any>(null);
-  const markersRef   = useRef<any[]>([]);
+  const markersRef   = useRef<Map<string, any>>(new Map());
 
+  // ── Init map ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!containerRef.current) return;
-
-    // ── Guard: if Leaflet already marked this container, destroy first ──────
-    // Handles React StrictMode double-invocation in development.
     const container = containerRef.current as any;
-    if (container._leaflet_id) {
-      container._leaflet_id = undefined;
-    }
+    if (container._leaflet_id) container._leaflet_id = undefined;
 
     let cancelled = false;
 
     import("leaflet").then((L) => {
       if (cancelled || !containerRef.current) return;
 
-      // Inject CSS once
       if (!document.getElementById("leaflet-css")) {
         const link  = document.createElement("link");
         link.id     = "leaflet-css";
@@ -56,11 +59,8 @@ export function HotspotsMap({ hotspots, height = 180 }: HotspotsMapProps) {
         document.head.appendChild(link);
       }
 
-      // Double-check container still clean after async gap
       const el = containerRef.current as any;
-      if (el._leaflet_id) {
-        el._leaflet_id = undefined;
-      }
+      if (el._leaflet_id) el._leaflet_id = undefined;
 
       const map = L.map(containerRef.current!, {
         zoomControl:        false,
@@ -75,48 +75,90 @@ export function HotspotsMap({ hotspots, height = 180 }: HotspotsMapProps) {
       }).addTo(map);
 
       mapRef.current = { map, L };
-
-      // Initial markers
-      syncMarkers(map, L, hotspots);
+      syncMarkers(map, L, hotspots, null);
     });
 
     return () => {
       cancelled = true;
-      // Remove map and clear the leaflet container ID so it can re-init
       if (mapRef.current) {
         mapRef.current.map.remove();
         mapRef.current = null;
       }
-      markersRef.current = [];
+      markersRef.current.clear();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Sync markers when hotspots update ─────────────────────────────────────
+  // ── Re-sync markers when hotspots list changes ────────────────────────────
   useEffect(() => {
     if (!mapRef.current || hotspots.length === 0) return;
     const { map, L } = mapRef.current;
-    syncMarkers(map, L, hotspots);
+    syncMarkers(map, L, hotspots, selectedId ?? null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hotspots]);
 
-  function syncMarkers(map: any, L: any, spots: Hotspot[]) {
-    // Clear old
+  // ── Fly to + highlight when selectedId changes ────────────────────────────
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const { map, L } = mapRef.current;
+
+    // Refresh all marker icons (highlight selected, normal for rest)
+    hotspots.forEach((spot) => {
+      const marker = markersRef.current.get(spot.id);
+      if (!marker) return;
+      const isSelected = spot.id === selectedId;
+      const svg  = makePinSvg(getColor(spot.severity), isSelected);
+      const blob = new Blob([svg], { type: "image/svg+xml" });
+      const url  = URL.createObjectURL(blob);
+      const size: [number, number] = isSelected ? [38, 49] : [28, 36];
+      marker.setIcon(L.icon({
+        iconUrl:     url,
+        iconSize:    size,
+        iconAnchor:  [size[0] / 2, size[1]],
+        popupAnchor: [0, -size[1]],
+      }));
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    });
+
+    if (!selectedId) return;
+
+    const spot = hotspots.find((h) => h.id === selectedId);
+    if (!spot) return;
+
+    const marker = markersRef.current.get(selectedId);
+
+    map.flyTo([spot.latitude, spot.longitude], 16, { duration: 0.6 });
+
+    // Open popup after fly completes
+    if (marker) {
+      setTimeout(() => {
+        marker.openPopup();
+      }, 650);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  function syncMarkers(map: any, L: any, spots: Hotspot[], activeId: string | null) {
     markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+    markersRef.current.clear();
 
     const latLngs: [number, number][] = [];
 
     spots.forEach((spot) => {
+      const isSelected = spot.id === activeId;
       const color = getColor(spot.severity);
-      const svg   = makePinSvg(color);
+      const svg   = makePinSvg(color, isSelected);
       const blob  = new Blob([svg], { type: "image/svg+xml" });
       const url   = URL.createObjectURL(blob);
+      const size: [number, number] = isSelected ? [38, 49] : [28, 36];
 
       const icon = L.icon({
         iconUrl:     url,
-        iconSize:    [28, 36],
-        iconAnchor:  [14, 36],
-        popupAnchor: [0, -36],
+        iconSize:    size,
+        iconAnchor:  [size[0] / 2, size[1]],
+        popupAnchor: [0, -size[1]],
       });
 
       const marker = L.marker([spot.latitude, spot.longitude], { icon })
@@ -127,14 +169,14 @@ export function HotspotsMap({ hotspots, height = 180 }: HotspotsMapProps) {
           { closeButton: false, offset: [0, -4] }
         );
 
-      markersRef.current.push(marker);
+      markersRef.current.set(spot.id, marker);
       latLngs.push([spot.latitude, spot.longitude]);
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     });
 
     if (latLngs.length === 1) {
       map.setView(latLngs[0], 15);
-    } else {
+    } else if (latLngs.length > 1) {
       map.fitBounds(L.latLngBounds(latLngs), { padding: [32, 32] });
     }
   }

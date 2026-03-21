@@ -1,5 +1,6 @@
 "use client";
 
+import { useState }   from "react";
 import dynamic         from "next/dynamic";
 import { ChevronRight, MapPin, Clock, MapPinOff } from "lucide-react";
 import { Badge }     from "@/components/ui/badge";
@@ -8,7 +9,6 @@ import { Skeleton }  from "@/components/ui/skeleton";
 import { getSeverityColor } from "../../lib/home/utils";
 import type { Hotspot } from "../../lib/home/type";
 
-// Dynamic import — Leaflet touches `window` on load, must be client-only
 const HotspotsMap = dynamic(
   () => import("@/components/home/Hotspotsmap").then((m) => m.HotspotsMap),
   {
@@ -16,8 +16,6 @@ const HotspotsMap = dynamic(
     loading: () => <Skeleton className="w-full h-[180px] rounded-none" />,
   }
 );
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Props = {
   hotspots:   Hotspot[];
@@ -32,10 +30,14 @@ const SEVERITY_CONFIG = {
   low:    { badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" },
 } as const;
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function NearbyHotspots({ hotspots, loading, error, onViewAll }: Props) {
   const activeCount = hotspots.length;
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  function handleRowClick(id: string) {
+    // Toggle off if already selected
+    setSelectedId((prev) => (prev === id ? null : id));
+  }
 
   return (
     <section className="mt-8 px-5">
@@ -98,9 +100,9 @@ export function NearbyHotspots({ hotspots, loading, error, onViewAll }: Props) {
       {!loading && !error && hotspots.length > 0 && (
         <div className="bg-card border border-border rounded-2xl overflow-hidden">
 
-          {/* Active count pill — sits above the map */}
+          {/* Map */}
           <div className="relative">
-            <HotspotsMap hotspots={hotspots} height={180} />
+            <HotspotsMap hotspots={hotspots} selectedId={selectedId} height={180} />
             <div className="absolute top-2.5 left-2.5 z-[1000] flex items-center gap-1.5 bg-background/90 border border-border rounded-lg px-2.5 py-1 pointer-events-none">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[11px] font-semibold text-foreground">
@@ -114,19 +116,30 @@ export function NearbyHotspots({ hotspots, loading, error, onViewAll }: Props) {
           {/* List */}
           <div>
             {hotspots.map((spot, index) => {
-              const cfg = SEVERITY_CONFIG[spot.severity];
+              const cfg        = SEVERITY_CONFIG[spot.severity];
+              const isSelected = spot.id === selectedId;
+
               return (
                 <div key={spot.id}>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/50 active:bg-accent/70 transition-colors">
+                  <button
+                    onClick={() => handleRowClick(spot.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors
+                      ${isSelected
+                        ? "bg-accent/50"
+                        : "hover:bg-accent/50 active:bg-accent/70"
+                      }`}
+                  >
                     <span
                       className="w-2 h-2 rounded-full flex-shrink-0"
                       style={{
                         backgroundColor: getSeverityColor(spot.severity),
-                        boxShadow:       `0 0 6px ${getSeverityColor(spot.severity)}80`,
+                        boxShadow: isSelected
+                          ? `0 0 0 3px ${getSeverityColor(spot.severity)}30, 0 0 8px ${getSeverityColor(spot.severity)}60`
+                          : `0 0 6px ${getSeverityColor(spot.severity)}80`,
                       }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <p className={`text-sm font-medium truncate transition-colors ${isSelected ? "text-foreground" : "text-foreground"}`}>
                         {spot.title}
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
